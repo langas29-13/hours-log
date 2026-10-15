@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hours Log</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--tx:#1b1f24;--mu:#667085;--ac:#2563eb;--acx:#fff;--bd:#d9dee5;--dg:#c62828;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111418;--card:#1b2026;--tx:#e8ebef;--mu:#9aa4b2;--ac:#5b8def;--acx:#0b1220;--bd:#2d343d;--dg:#ef6b6b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111418;--card:#1b2026;--tx:#e8ebef;--mu:#9aa4b2;--ac:#5b8def;--acx:#0b1220;--bd:#2d343d;--dg:#ef6b6b;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:14px}
+h1{font-size:20px;margin:4px 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+label{display:block;font-size:12px;color:var(--mu);margin-bottom:3px}
+input,select,textarea{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:9px}
+.row{display:grid;gap:8px;margin-bottom:8px}
+.r2{grid-template-columns:1fr 1fr}
+.r5{grid-template-columns:repeat(5,1fr)}
+.r5 input{padding:9px 4px;text-align:center}
+.r5 label{font-size:11px;text-align:center}
+button{font:inherit;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:8px;padding:10px 12px;cursor:pointer}
+button.p{background:var(--ac);color:var(--acx);border-color:var(--ac);font-weight:600;width:100%}
+button.d{color:var(--dg);border-color:var(--dg)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns button{flex:1}
+.sc{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{border-bottom:1px solid var(--bd);padding:6px 5px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--mu)}
+td.n,th.n{text-align:right}
+tfoot td{font-weight:700;border-top:2px solid var(--bd)}
+.x{border:0;background:none;color:var(--dg);padding:0 4px;font-size:18px}
+.mu{color:var(--mu);font-size:13px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+.mb{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px;max-width:340px;width:100%}
+.mb h2{font-size:17px;margin:0 0 6px}
+.mb p{margin:0 0 14px;color:var(--mu)}
+.mb .btns button{padding:12px}
+button.dd{background:var(--dg);border-color:var(--dg);color:#fff;font-weight:600}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+</style></head><body><main>
+<h1>Hours Log</h1>
+
+<div class="card">
+  <label for="month">Month</label>
+  <input type="month" id="month">
+</div>
+
+<div class="card">
+  <div class="row r2">
+    <div><label for="co">Company</label>
+      <select id="co"><option>VRT</option><option>BIO</option><option>T</option></select></div>
+    <div><label for="dt">Date</label><input type="date" id="dt"></div>
+  </div>
+  <div class="row r5">
+    <div><label for="h0">Normal</label><input id="h0" type="number" inputmode="decimal" step="0.25" min="0" placeholder="0"></div>
+    <div><label for="h1">OT 1.5x</label><input id="h1" type="number" inputmode="decimal" step="0.25" min="0" placeholder="0"></div>
+    <div><label for="h2">Sat 1.5x</label><input id="h2" type="number" inputmode="decimal" step="0.25" min="0" placeholder="0"></div>
+    <div><label for="h3">Sun 2x</label><input id="h3" type="number" inputmode="decimal" step="0.25" min="0" placeholder="0"></div>
+    <div><label for="h4">PH 2x</label><input id="h4" type="number" inputmode="decimal" step="0.25" min="0" placeholder="0"></div>
+  </div>
+  <div class="row"><div><label for="ds">Job description</label><textarea id="ds" rows="2"></textarea></div></div>
+  <button class="p" id="add">Add line</button>
+</div>
+
+<div class="card">
+  <div class="sc"><table id="tbl"></table></div>
+  <p class="mu" id="empty">No entries for this month yet.</p>
+</div>
+
+<div class="card">
+  <div class="btns">
+    <button id="copy">Copy table</button>
+    <button id="mail">Email</button>
+    <button id="csv">CSV</button>
+    <button id="clr" class="d">Clear month</button>
+  </div>
+  <p class="mu" id="hint" style="margin:8px 0 0">Copy table pastes straight into a spreadsheet or an email.</p>
+</div>
+</main>
+<div class="ov" id="ov"><div class="mb" role="alertdialog" aria-labelledby="mt">
+  <h2 id="mt">Clear this month?</h2>
+  <p id="mp"></p>
+  <div class="btns"><button id="no">Cancel</button><button id="yes" class="dd">Delete</button></div>
+</div></div>
+<div id="toast"></div>
+
+<script>
+var KEY='hourslog:v1',H=['Normal','OT 1.5x','Sat 1.5x','Sun 2x','PH 2x'],db={};
+var $=function(i){return document.getElementById(i)};
+try{db=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){db={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Could not save')}}
+function toast(m){var t=$('toast');t.textContent=m;t.className='on';setTimeout(function(){t.className=''},1800)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function fd(d){var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function pad(n){return n<10?'0'+n:''+n}
+function today(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function rows(){return (db[$('month').value]||[]).slice().sort(function(a,b){return a.d<b.d?-1:a.d>b.d?1:0})}
+function totals(r){var t=[0,0,0,0,0];r.forEach(function(e){e.h.forEach(function(v,i){t[i]+=v})});return t}
+function f(v){return v?String(Math.round(v*100)/100):''}
+function setDate(){var m=$('month').value,t=today();$('dt').value=t.slice(0,7)===m?t:m+'-01'}
+
+function render(){
+  var r=rows(),t=totals(r),h='<thead><tr><th>Date</th><th>Company</th>';
+  H.forEach(function(x){h+='<th class="n">'+x+'</th>'});
+  h+='<th>Description</th><th></th></tr></thead><tbody>';
+  r.forEach(function(e){
+    h+='<tr><td>'+fd(e.d)+'</td><td>'+esc(e.c)+'</td>';
+    e.h.forEach(function(v){h+='<td class="n">'+f(v)+'</td>'});
+    h+='<td>'+esc(e.s)+'</td><td><button class="x" data-id="'+e.id+'" aria-label="Delete">&times;</button></td></tr>';
+  });
+  h+='</tbody><tfoot><tr><td colspan="2">Total</td>';
+  t.forEach(function(v){h+='<td class="n">'+f(v)+'</td>'});
+  h+='<td></td><td></td></tr></tfoot>';
+  $('tbl').innerHTML=h;
+  $('tbl').style.display=r.length?'':'none';
+  $('empty').style.display=r.length?'none':'';
+  resetClr();
+}
+
+$('add').onclick=function(){
+  var hv=[0,1,2,3,4].map(function(i){return parseFloat($('h'+i).value)||0});
+  if(!$('dt').value){toast('Pick a date');return}
+  if(!hv.some(function(v){return v>0})){toast('Enter some hours');return}
+  var k=$('dt').value.slice(0,7);
+  (db[k]=db[k]||[]).push({id:Date.now()+'',c:$('co').value,d:$('dt').value,h:hv,s:$('ds').value.trim()});
+  save();
+  for(var i=0;i<5;i++)$('h'+i).value='';
+  $('ds').value='';
+  $('month').value=k;
+  render();toast('Added');
+};
+
+$('tbl').onclick=function(ev){
+  var id=ev.target.getAttribute&&ev.target.getAttribute('data-id');
+  if(!id)return;
+  var k=$('month').value;
+  db[k]=(db[k]||[]).filter(function(e){return e.id!==id});
+  if(!db[k].length)delete db[k];
+  save();render();
+};
+
+$('month').onchange=function(){if(!$('month').value)$('month').value=today().slice(0,7);setDate();render()};
+
+function resetClr(){$('ov').style.display='none'}
+$('clr').onclick=function(){
+  var n=rows().length;
+  if(!n){toast('Nothing to clear');return}
+  $('mp').textContent='Delete all '+n+(n==1?' entry':' entries')+' for '+monthName()+'? This cannot be undone.';
+  $('ov').style.display='flex';
+};
+$('no').onclick=resetClr;
+$('ov').onclick=function(e){if(e.target===$('ov'))resetClr()};
+$('yes').onclick=function(){
+  delete db[$('month').value];save();resetClr();render();toast('Month cleared');
+};
+
+function q(s){s=String(s);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
+$('csv').onclick=function(){
+  var r=rows();
+  if(!r.length){toast('Nothing to export');return}
+  var t=totals(r),L=[['Date','Company'].concat(H,['Description']).map(q).join(',')];
+  r.forEach(function(e){L.push([fd(e.d),e.c].concat(e.h.map(f),[e.s]).map(q).join(','))});
+  L.push(['Total',''].concat(t.map(f),['']).map(q).join(','));
+  var data='\ufeff'+L.join('\r\n');
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([data],{type:'text/csv;charset=utf-8'}));
+  a.download='hours-'+$('month').value+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href)},2000);
+  toast('CSV downloaded');
+};
+
+function textTable(){
+  var r=rows(),t=totals(r),L=[['Date','Company'].concat(H,['Description']).join('\t')];
+  r.forEach(function(e){L.push([fd(e.d),e.c].concat(e.h.map(f),[e.s]).join('\t'))});
+  L.push(['Total',''].concat(t.map(f),['']).join('\t'));
+  return L.join('\n');
+}
+function htmlTable(){
+  var r=rows(),t=totals(r),c='style="border:1px solid #999;padding:4px 8px"';
+  var h='<table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:13px"><tr>';
+  ['Date','Company'].concat(H,['Description']).forEach(function(x){h+='<th '+c+'>'+x+'</th>'});
+  h+='</tr>';
+  r.forEach(function(e){h+='<tr><td '+c+'>'+fd(e.d)+'</td><td '+c+'>'+esc(e.c)+'</td>'+e.h.map(function(v){return '<td '+c+' align="right">'+f(v)+'</td>'}).join('')+'<td '+c+'>'+esc(e.s)+'</td></tr>'});
+  h+='<tr><td '+c+'><b>Total</b></td><td '+c+'></td>'+t.map(function(v){return '<td '+c+' align="right"><b>'+f(v)+'</b></td>'}).join('')+'<td '+c+'></td></tr></table>';
+  return h;
+}
+function monthName(){var p=$('month').value.split('-');return new Date(p[0],p[1]-1,1).toLocaleString('en-AU',{month:'long',year:'numeric'})}
+
+$('copy').onclick=function(){
+  if(!rows().length){toast('Nothing to copy');return}
+  var tx=textTable(),hh=htmlTable();
+  function fallback(){
+    var ta=document.createElement('textarea');ta.value=tx;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    var ok=false;try{ok=document.execCommand('copy')}catch(e){}
+    document.body.removeChild(ta);toast(ok?'Copied':'Copy blocked - use Email');
+  }
+  try{
+    if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write){
+      navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([hh],{type:'text/html'}),'text/plain':new Blob([tx],{type:'text/plain'})})]).then(function(){toast('Copied')},fallback);
+    }else fallback();
+  }catch(e){fallback()}
+};
+
+$('mail').onclick=function(){
+  if(!rows().length){toast('Nothing to send');return}
+  var r=rows(),t=totals(r),L=[];
+  r.forEach(function(e){
+    var p=[];e.h.forEach(function(v,i){if(v)p.push(H[i]+': '+f(v))});
+    L.push(fd(e.d)+' - '+e.c+' - '+p.join(', ')+(e.s?' - '+e.s:''));
+  });
+  L.push('','TOTALS: '+H.map(function(x,i){return x+' '+(f(t[i])||0)}).join(', '));
+  location.href='mailto:?subject='+encodeURIComponent('Hours - '+monthName())+'&body='+encodeURIComponent(L.join('\n'));
+};
+
+$('month').value=today().slice(0,7);setDate();render();
+if('serviceWorker' in navigator)window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){})});
+</script></body></html>
